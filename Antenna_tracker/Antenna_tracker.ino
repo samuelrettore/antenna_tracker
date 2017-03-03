@@ -14,12 +14,19 @@
 #define RSSI_esquerda 1
 #define RSSI_vertical 2
 
-#define RSSI_MIN 85
-#define RSSI_MAX 244
 
 /**
- * Valor usado para nao varir todo montendo somente 
- * quando firerenca de leitura maior que 5.
+ * Alterado para variaveis
+ * Calibracao automatica
+ */
+//#define RSSI_MIN 85
+//#define RSSI_MAX 244
+int RSSI_MIN = 0;
+int RSSI_MAX = 0;
+
+/**
+ * Valor usado para nao varrer todo montendo informações de leitura, somente
+ * quando diferencia de leitura maior que o parametro.
  */
 #define DEADBAND 5
 
@@ -35,7 +42,6 @@
  */
 #define SERVO_MAX 180
 #define SERVO_MIN 13
-#define SERVO_SPEED 5
 
 VarSpeedServo servoP;
 //VarSpeedServo servoT;
@@ -62,37 +68,74 @@ void setup() {
   Serial.println("Fim Setup");
 }
 
+/**
+ * Loop principal
+ */
 void loop() {
   verificaEntrada();
   Serial.print("RSSI // esquerda = ");
   Serial.print(esquerda);
   Serial.print(", direita = ");
-  Serial.print(direita); 
-  
+  Serial.print(direita);   
   Serial.print(", angulo calculado = ");
-  Serial.println(angulo);  
+  Serial.print(angulo);  
+  Serial.print(", RSSI_MIN = ");
+  Serial.print(RSSI_MIN);
+  Serial.print(", RSSI_MAX = ");
+  Serial.println(RSSI_MAX);
   //delay(80);   
 }
 
+/**
+ * Metodo que verifica entrada e controla rotação esquerda ou direita, 
+ * conforme leitura de RSSI
+ * #featura: também deve calcular velocidade de deslocamento.
+ */
 void verificaEntrada(){
   esquerda = analogRead(RSSI_esquerda);
   direita = analogRead(RSSI_direita);
   //esquerda = random(RSSI_MIN, RSSI_MAX);
   //direita = random(RSSI_MIN, RSSI_MAX);  
+  calibraRSSI(esquerda,direita);
+  
   if(esquerda > direita && abs(esquerda_old-esquerda) > DEADBAND){
-    angulo = angulo+SERVO_SPEED;
+    angulo = angulo+1;
     esquerda_old = esquerda;
   }else if(direita > esquerda && abs(direita_old-direita) > DEADBAND){
-    angulo = angulo-SERVO_SPEED;
+    angulo = angulo-1;
     direita_old = direita;
   }  
   mudaAngulo(angulo);
 }
 
+/**
+ * Metodo que muda o angulo do motor, conforme processamento.
+ */
 void mudaAngulo(int ang){
   //Segurança Servo  
   ang = constrain(ang,SERVO_MIN,SERVO_MAX);
   angulo = ang;
+  //Velocidade Fixa
   servoP.write(ang, 30, true);
 }
+
+
+/**
+ * Metodo de calibração de RSSI
+ * #Experimental
+ */
+ void calibraRSSI(int vl1, int vl2){
+    if(vl1 <= RSSI_MIN || RSSI_MIN == 0){
+        RSSI_MIN = vl1;
+    }
+    if(vl2 <= RSSI_MIN || RSSI_MIN == 0){
+        RSSI_MIN = vl2;
+    }
+    if(vl1>= RSSI_MAX || RSSI_MAX ==0){
+      RSSI_MAX = vl1;
+    }
+    if(vl2 >= RSSI_MAX || RSSI_MAX ==0){
+      RSSI_MAX = vl2;
+    }
+ }
 
