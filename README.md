@@ -11,3 +11,7 @@ Features:
 Melhoria no exponencial da curva de movimentação.
 Suporta a Motores de 360 graus
 Suporte a motores de passo para projetos mais elaborados.
+
+
+## Bibliotecas necessarias
+https://github.com/netlabtoolkit/VarSpeedServo
