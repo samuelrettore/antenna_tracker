@@ -43,6 +43,9 @@ int RSSI_MAX_s = 0;
 #define SERVO_PAN 5
 #define SERVO_TILT 6
 
+//Direção Normal 0, invertido -1.
+#define SERVO_DIRECTION     1
+
 /*
  * Define Minimo e maximo do servo
  */
@@ -53,9 +56,17 @@ VarSpeedServo servoP;
 //VarSpeedServo servoT;
 
 int angulo = (SERVO_MAX/2);
+
 //Variaveis
 int esquerda = 0, direita = 0;
 int esquerda_old = 0, direita_old = 0;
+
+
+#define INICIO  10
+#define ULTIMO  INICIO - 1
+
+uint16_t rssi_esquerda_array[INICIO];
+uint16_t rssi_direita_array[INICIO];
 
 void setup() {
   Serial.begin(115200);
@@ -71,6 +82,12 @@ void setup() {
   //Seta Meio
   mudaAngulo((SERVO_MAX/2));
   //servoT.write((SERVO_MAX/2));
+
+  //Zera arrays  
+  for (int i = 0; i < INICIO; i++) {
+    rssi_esquerda_array[i] = 0;
+    rssi_direita_array[i] = 0;
+  }  
   Serial.println("Fim Setup");
 }
 
@@ -103,17 +120,29 @@ void loop() {
  * #featura: também deve calcular velocidade de deslocamento.
  */
 void verificaEntrada(){
+  //Le dados da porta
   esquerda = analogRead(RSSI_esquerda);
   direita = analogRead(RSSI_direita);
+  
+  //Desloca Array
+  avancaArray(rssi_esquerda_array, INICIO);
+  avancaArray(rssi_direita_array, INICIO);
+
+  //Copia Para array
+  rssi_esquerda_array[ULTIMO] = esquerda;
+  rssi_direita_array[ULTIMO] = direita;
+  
   //esquerda = random(RSSI_MIN, RSSI_MAX);
   //direita = random(RSSI_MIN, RSSI_MAX);  
+  //Pode calibrar pelo array
   calibraRSSI(esquerda,direita);
   
   if(esquerda > direita && abs(esquerda_old-esquerda) > DEADBAND){
-    angulo = angulo+1;
+    angulo = (angulo+1)*SERVO_DIRECTION;
     esquerda_old = esquerda;
+    
   }else if(direita > esquerda && abs(direita_old-direita) > DEADBAND){
-    angulo = angulo-1;
+    angulo = (angulo-1)*SERVO_DIRECTION * -1;
     direita_old = direita;
   }  
   mudaAngulo(angulo);
@@ -153,4 +182,13 @@ void mudaAngulo(int ang){
     //Verifica Superior.
     //#Future
  }
+
+/**
+ * Metodo que avança posição no array
+ */
+void avancaArray(uint16_t *posicoes, uint8_t n) {
+  for (uint8_t i = 0; i < n - 1; i++) {
+    posicoes[i] = posicoes[i + 1];
+  }
+}
 
