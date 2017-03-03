@@ -38,7 +38,7 @@
 #define SERVO_SPEED 5
 
 VarSpeedServo servoP;
-VarSpeedServo servoT;
+//VarSpeedServo servoT;
 
 int angulo = (SERVO_MAX/2);
 //Variaveis
@@ -49,16 +49,16 @@ void setup() {
   Serial.begin(115200);
   Serial.println("Iniciou Setup");
   servoP.attach(SERVO_PAN);
-  servoT.attach(SERVO_TILT);
+  //servoT.attach(SERVO_TILT);
   //Gira esquerda  
-  servoP.write(SERVO_MIN, 30, true);
-  servoT.write(SERVO_MIN, 30, true);
+  mudaAngulo(SERVO_MIN);
+  //servoT.write(SERVO_MIN, 30, true);
   //Gira direita
-  servoP.write(SERVO_MAX, 30, true);
-  servoT.write(SERVO_MAX, 30, true);  
+  mudaAngulo(SERVO_MAX);
+  //servoT.write(SERVO_MAX, 30, true);  
   //Seta Meio
-  servoP.write((SERVO_MAX/2));
-  servoT.write((SERVO_MAX/2));
+  mudaAngulo((SERVO_MAX/2));
+  //servoT.write((SERVO_MAX/2));
   Serial.println("Fim Setup");
 }
 
@@ -85,9 +85,14 @@ void verificaEntrada(){
   }else if(direita > esquerda && abs(direita_old-direita) > DEADBAND){
     angulo = angulo-SERVO_SPEED;
     direita_old = direita;
-  }
+  }  
+  mudaAngulo(angulo);
+}
+
+void mudaAngulo(int ang){
   //Segurança Servo  
-  angulo = constrain(angulo,SERVO_MIN,SERVO_MAX);
-  servoP.write(angulo, 30, true);
+  ang = constrain(ang,SERVO_MIN,SERVO_MAX);
+  angulo = ang;
+  servoP.write(ang, 30, true);
 }
 
