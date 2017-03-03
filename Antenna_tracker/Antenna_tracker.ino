@@ -50,7 +50,7 @@ int RSSI_MAX_s = 0;
  * Define Minimo e maximo do servo
  */
 #define SERVO_MAX 180
-#define SERVO_MIN 13
+#define SERVO_MIN 0
 
 VarSpeedServo servoP;
 //VarSpeedServo servoT;
@@ -59,8 +59,6 @@ int angulo = (SERVO_MAX/2);
 
 //Variaveis
 int esquerda = 0, direita = 0;
-int esquerda_old = 0, direita_old = 0;
-
 
 #define INICIO  10
 #define ULTIMO  INICIO - 1
@@ -104,14 +102,12 @@ void loop() {
   Serial.print(angulo);  
   Serial.print(", RSSI_MIN_e = ");
   Serial.print(RSSI_MIN_e);
-  Serial.print(", RSSI_MAX_e = ");
+  Serial.print(" / ");
   Serial.print(RSSI_MAX_e);
   Serial.print(", RSSI_MIN_D = ");
   Serial.print(RSSI_MIN_d);
-  Serial.print(", RSSI_MAX_D = ");
+  Serial.print(", / ");
   Serial.println(RSSI_MAX_d);
-  
-  //delay(80);   
 }
 
 /**
@@ -120,9 +116,15 @@ void loop() {
  * #featura: também deve calcular velocidade de deslocamento.
  */
 void verificaEntrada(){
+  
+  esquerda = random(85, 244);
+  //esquerda=0;
+  direita = random(85, 244); 
+  //direita=0;  
+  
   //Le dados da porta
-  esquerda = analogRead(RSSI_esquerda);
-  direita = analogRead(RSSI_direita);
+  //esquerda = analogRead(RSSI_esquerda);
+  //direita = analogRead(RSSI_direita);
   
   //Desloca Array
   avancaArray(rssi_esquerda_array, INICIO);
@@ -132,18 +134,14 @@ void verificaEntrada(){
   rssi_esquerda_array[ULTIMO] = esquerda;
   rssi_direita_array[ULTIMO] = direita;
   
-  //esquerda = random(RSSI_MIN, RSSI_MAX);
-  //direita = random(RSSI_MIN, RSSI_MAX);  
   //Pode calibrar pelo array
   calibraRSSI(esquerda,direita);
   
-  if(esquerda > direita && abs(esquerda_old-esquerda) > DEADBAND){
+  if(esquerda > direita && abs(rssi_esquerda_array[ULTIMO-1]-esquerda) > DEADBAND){
     angulo = (angulo+1)*SERVO_DIRECTION;
-    esquerda_old = esquerda;
     
-  }else if(direita > esquerda && abs(direita_old-direita) > DEADBAND){
-    angulo = (angulo-1)*SERVO_DIRECTION * -1;
-    direita_old = direita;
+  }else if(direita > esquerda && abs(rssi_direita_array[ULTIMO-1]-direita) > DEADBAND){
+    angulo = (angulo-1)*SERVO_DIRECTION;
   }  
   mudaAngulo(angulo);
 }
@@ -156,7 +154,8 @@ void mudaAngulo(int ang){
   ang = constrain(ang,SERVO_MIN,SERVO_MAX);
   angulo = ang;
   //Velocidade Fixa
-  servoP.write(ang, 30, true);
+  servoP.write(ang, 70, true);
+  delay(20);
 }
 
 
