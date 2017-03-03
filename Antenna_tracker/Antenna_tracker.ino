@@ -21,9 +21,15 @@
  */
 //#define RSSI_MIN 85
 //#define RSSI_MAX 244
-int RSSI_MIN = 0;
-int RSSI_MAX = 0;
-
+//Rssi Direita
+int RSSI_MIN_d = 0;
+int RSSI_MAX_d = 0;
+//Rssi Esquerda
+int RSSI_MIN_e = 0;
+int RSSI_MAX_e = 0;
+//Rssi Suprerior
+int RSSI_MIN_s = 0;
+int RSSI_MAX_s = 0;
 /**
  * Valor usado para nao varrer todo montendo informações de leitura, somente
  * quando diferencia de leitura maior que o parametro.
@@ -79,10 +85,15 @@ void loop() {
   Serial.print(direita);   
   Serial.print(", angulo calculado = ");
   Serial.print(angulo);  
-  Serial.print(", RSSI_MIN = ");
-  Serial.print(RSSI_MIN);
-  Serial.print(", RSSI_MAX = ");
-  Serial.println(RSSI_MAX);
+  Serial.print(", RSSI_MIN_e = ");
+  Serial.print(RSSI_MIN_e);
+  Serial.print(", RSSI_MAX_e = ");
+  Serial.print(RSSI_MAX_e);
+  Serial.print(", RSSI_MIN_D = ");
+  Serial.print(RSSI_MIN_d);
+  Serial.print(", RSSI_MAX_D = ");
+  Serial.println(RSSI_MAX_d);
+  
   //delay(80);   
 }
 
@@ -124,18 +135,22 @@ void mudaAngulo(int ang){
  * Metodo de calibração de RSSI
  * #Experimental
  */
- void calibraRSSI(int vl1, int vl2){
-    if(vl1 <= RSSI_MIN || RSSI_MIN == 0){
-        RSSI_MIN = vl1;
+ void calibraRSSI(int esquerda, int direita){
+    //Verifica Direita.
+    if(direita <= RSSI_MIN_d || RSSI_MIN_d == 0){
+        RSSI_MIN_d = direita;
     }
-    if(vl2 <= RSSI_MIN || RSSI_MIN == 0){
-        RSSI_MIN = vl2;
+    if(esquerda <= RSSI_MIN_e || RSSI_MIN_e == 0){
+        RSSI_MIN_e = esquerda;
     }
-    if(vl1>= RSSI_MAX || RSSI_MAX ==0){
-      RSSI_MAX = vl1;
+    //Verifica Esquerda.
+    if(direita >= RSSI_MAX_d || RSSI_MAX_d ==0){
+      RSSI_MAX_d = direita;
     }
-    if(vl2 >= RSSI_MAX || RSSI_MAX ==0){
-      RSSI_MAX = vl2;
+    if(esquerda >= RSSI_MAX_e || RSSI_MAX_e ==0){
+      RSSI_MAX_e = esquerda;
     }
+    //Verifica Superior.
+    //#Future
  }
 
