@@ -3,7 +3,7 @@
  * Baseado no projeto https://youtu.be/aACTKziuDVE
  * Antenna Tracker baseada em Arduino e RSSI 
  */
-#include <Servo.h>
+#include <VarSpeedServo.h>
 
 /*
  * Configuracao RSSI
@@ -37,8 +37,8 @@
 #define SERVO_MIN 13
 #define SERVO_SPEED 5
 
-Servo servoP;
-Servo servoT;
+VarSpeedServo servoP;
+VarSpeedServo servoT;
 
 int angulo = (SERVO_MAX/2);
 //Variaveis
@@ -50,14 +50,13 @@ void setup() {
   Serial.println("Iniciou Setup");
   servoP.attach(SERVO_PAN);
   servoT.attach(SERVO_TILT);
-  
-  servoP.write(SERVO_MIN);
-  servoT.write(SERVO_MIN);
-  delay(1000);
-  servoP.write(SERVO_MAX);
-  servoT.write(SERVO_MAX);
-  delay(1000);
-  //Midle
+  //Gira esquerda  
+  servoP.write(SERVO_MIN, 30, true);
+  servoT.write(SERVO_MIN, 30, true);
+  //Gira direita
+  servoP.write(SERVO_MAX, 30, true);
+  servoT.write(SERVO_MAX, 30, true);  
+  //Seta Meio
   servoP.write((SERVO_MAX/2));
   servoT.write((SERVO_MAX/2));
   Serial.println("Fim Setup");
@@ -72,7 +71,7 @@ void loop() {
   
   Serial.print(", angulo calculado = ");
   Serial.println(angulo);  
-  delay(80);   
+  //delay(80);   
 }
 
 void verificaEntrada(){
@@ -89,6 +88,6 @@ void verificaEntrada(){
   }
   //Segurança Servo  
   angulo = constrain(angulo,SERVO_MIN,SERVO_MAX);
-  servoP.write(angulo);
+  servoP.write(angulo, 30, true);
 }
 
