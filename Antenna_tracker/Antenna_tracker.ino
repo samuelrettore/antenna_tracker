@@ -12,6 +12,7 @@
  */
 #define RSSI_direita 0
 #define RSSI_esquerda 1
+//#Future
 #define RSSI_vertical 2
 
 
@@ -50,12 +51,12 @@ int RSSI_MAX_s = 0;
  * Define Minimo e maximo do servo
  */
 #define SERVO_MAX 180
-#define SERVO_MIN 0
+#define SERVO_MIN 13
 
 VarSpeedServo servoP;
 //VarSpeedServo servoT;
 
-int angulo = (SERVO_MAX/2);
+int angulo = 90;
 
 //Variaveis
 int esquerda = 0, direita = 0;
@@ -66,20 +67,15 @@ int esquerda = 0, direita = 0;
 uint16_t rssi_esquerda_array[INICIO];
 uint16_t rssi_direita_array[INICIO];
 
+
+#define SIGMOID_SLOPE       1
+#define SIGMOID_OFFSET 4
+
 void setup() {
   Serial.begin(115200);
   Serial.println("Iniciou Setup");
   servoP.attach(SERVO_PAN);
   //servoT.attach(SERVO_TILT);
-  //Gira esquerda  
-  mudaAngulo(SERVO_MIN);
-  //servoT.write(SERVO_MIN, 30, true);
-  //Gira direita
-  mudaAngulo(SERVO_MAX);
-  //servoT.write(SERVO_MAX, 30, true);  
-  //Seta Meio
-  mudaAngulo((SERVO_MAX/2));
-  //servoT.write((SERVO_MAX/2));
 
   //Zera arrays  
   for (int i = 0; i < INICIO; i++) {
@@ -98,7 +94,7 @@ void loop() {
   Serial.print(esquerda);
   Serial.print(", direita = ");
   Serial.print(direita);   
-  Serial.print(", angulo calculado = ");
+  Serial.print(", angulo calc = ");
   Serial.print(angulo);  
   Serial.print(", RSSI_MIN_e = ");
   Serial.print(RSSI_MIN_e);
@@ -117,14 +113,14 @@ void loop() {
  */
 void verificaEntrada(){
   
-  esquerda = random(85, 244);
+  //esquerda = random(85, 244);
   //esquerda=0;
-  direita = random(85, 244); 
+  //direita = random(85, 244); 
   //direita=0;  
   
   //Le dados da porta
-  //esquerda = analogRead(RSSI_esquerda);
-  //direita = analogRead(RSSI_direita);
+  esquerda = analogRead(RSSI_esquerda);
+  direita = analogRead(RSSI_direita);
   
   //Desloca Array
   avancaArray(rssi_esquerda_array, INICIO);
@@ -136,14 +132,42 @@ void verificaEntrada(){
   
   //Pode calibrar pelo array
   calibraRSSI(esquerda,direita);
+
+  uint16_t mediaEsquerda = max(media(rssi_esquerda_array, INICIO), RSSI_MIN_e);
+  uint16_t mediaDireita = max(media(rssi_direita_array, INICIO), RSSI_MIN_d);
+
+  
+  //Experimental
+  float ang = 0;
   
   if(esquerda > direita && abs(rssi_esquerda_array[ULTIMO-1]-esquerda) > DEADBAND){
-    angulo = (angulo+1)*SERVO_DIRECTION;
+    //angulo = (angulo+1)*SERVO_DIRECTION;
+
+    float x = float(mediaEsquerda - mediaDireita) / 10;
+    x = (1+ exp(-SIGMOID_SLOPE * x + SIGMOID_OFFSET));
+    ang = x * SERVO_DIRECTION;
+    
+    
     
   }else if(direita > esquerda && abs(rssi_direita_array[ULTIMO-1]-direita) > DEADBAND){
-    angulo = (angulo-1)*SERVO_DIRECTION;
+    //angulo = (angulo-1)*SERVO_DIRECTION;
+
+    float x = float(mediaDireita - mediaEsquerda) / 10;
+    x = (1+ exp(-SIGMOID_SLOPE * x + SIGMOID_OFFSET));
+    ang = x * SERVO_DIRECTION * -1;      
+    
   }  
-  mudaAngulo(angulo);
+  
+  Serial.print("Valor esquerda=");
+  Serial.print(mediaEsquerda);
+  Serial.print(", valor direita=");
+  Serial.print(mediaDireita);
+  Serial.print(", ang = ");
+  Serial.print(ang);
+  Serial.print(", angulo = ");
+  Serial.println(angulo);
+  
+  mudaAngulo(ang);
 }
 
 /**
@@ -151,10 +175,10 @@ void verificaEntrada(){
  */
 void mudaAngulo(int ang){
   //Segurança Servo  
-  ang = constrain(ang,SERVO_MIN,SERVO_MAX);
-  angulo = ang;
+  angulo += ang;
+  angulo = constrain(angulo,SERVO_MIN,SERVO_MAX);  
   //Velocidade Fixa
-  servoP.write(ang, 70, true);
+  servoP.write(angulo, 50, true);
   delay(20);
 }
 
@@ -190,4 +214,16 @@ void avancaArray(uint16_t *posicoes, uint8_t n) {
     posicoes[i] = posicoes[i + 1];
   }
 }
+
+/**
+ * Metodo de calculo de media das medições rssi (ultimas 10).
+ */
+uint16_t media(uint16_t lista[], uint8_t n) {
+  uint32_t soma = 0;
+  for (uint8_t i = 0; i < n; i++) {
+    soma += lista[i];
+  }
+  return uint16_t(soma / n);
+}
+
 
