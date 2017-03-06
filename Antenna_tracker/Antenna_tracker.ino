@@ -1,3 +1,4 @@
+
 /**
  * Projeto desenvolvido por Samuel Rettore e Hugo Almeida
  * Baseado no projeto https://youtu.be/aACTKziuDVE
@@ -44,6 +45,12 @@ int RSSI_MAX_s = 0;
 #define SERVO_PAN 5
 #define SERVO_TILT 6
 
+/**
+ * Velocidade do servo
+ * Valores de 1 a 255
+ */
+#define SERVO_SPEED 50
+
 //Direção Normal 0, invertido -1.
 #define SERVO_DIRECTION     1
 
@@ -77,6 +84,13 @@ void setup() {
   servoP.attach(SERVO_PAN);
   //servoT.attach(SERVO_TILT);
 
+  mudaAngulo(SERVO_MIN,20);
+  delay(100);
+  mudaAngulo(SERVO_MAX,20);
+  delay(100);
+  mudaAngulo(90,20);
+  delay(100);
+  
   //Zera arrays  
   for (int i = 0; i < INICIO; i++) {
     rssi_esquerda_array[i] = 0;
@@ -167,19 +181,22 @@ void verificaEntrada(){
   Serial.print(", angulo = ");
   Serial.println(angulo);
   
-  mudaAngulo(ang);
+  mudaAngulo(ang,0);
 }
 
 /**
  * Metodo que muda o angulo do motor, conforme processamento.
  */
-void mudaAngulo(int ang){
+void mudaAngulo(int ang, int velocidade){
   //Segurança Servo  
   angulo += ang;
   angulo = constrain(angulo,SERVO_MIN,SERVO_MAX);  
+  if(velocidade <= 0){
+    velocidade = SERVO_SPEED;
+  }
   //Velocidade Fixa
-  servoP.write(angulo, 50, true);
-  delay(20);
+  servoP.write(angulo, velocidade, true);
+  //delay(20);
 }
 
 
