@@ -61,7 +61,7 @@ int Controle::getDireita(){
   Serial.print("3 - Angulo para = ");
   Serial.println(angulo);
   //Move Servo para Centro.
-  mudaAngulo(angulo,40, true);
+  mudaAngulo(90,40, true);
   lePortaCalibra();
   delay(1000);
  }
@@ -192,8 +192,8 @@ void Controle::mudaAngulo(int ang, int velocidade, boolean calibrate){
     velocidade = SERVO_SPEED;
   }
   //Velocidade Fixa
-  servoP.write(angulo, velocidade, false);
-  delay(20);
+  servoP.write(angulo, velocidade, true);
+  //delay(20);
 }
 
 
