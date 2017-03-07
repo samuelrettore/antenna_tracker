@@ -1,10 +1,13 @@
 #include "Arduino.h"
 #include "Controle.h"
 #include "Config.h"
+#include "ObjData.h"
 #include <VarSpeedServo.h>
 
 VarSpeedServo servoP;
 //VarSpeedServo servoT;
+
+ObjData rssi_array_dados[INICIO];
 
 /**
  * Metodo inicialização do modulo
@@ -16,6 +19,7 @@ void Controle::IinicializaModulo(){
   //servoT.attach(SERVO_TILT);
   
   calibraInicio();  
+  
   //Zera arrays  
   for (int i = 0; i < INICIO; i++) {
     rssi_esquerda_array[i] = 0;
@@ -73,6 +77,20 @@ void Controle::lePortaCalibra(){
   avancaArray(rssi_esquerda_array, INICIO);
   avancaArray(rssi_direita_array, INICIO);
 
+  //Desloca Array de Objetos
+  avancaArrayObj(rssi_array_dados, INICIO);
+
+  //Cria Objeto
+  ObjData obj; 
+
+  //Preenche objetos
+  obj.setEsquerda(esquerda);
+  obj.setDireita(direita);
+  obj.setPercentEsquerda(map(esquerda,RSSI_MIN_e,RSSI_MAX_e,0,100));
+  obj.setPercentDireita(map(direita,RSSI_MIN_d,RSSI_MAX_d,0,100));
+
+  rssi_array_dados[ULTIMO] = obj;
+  
   //Copia Para array
   rssi_esquerda_array[ULTIMO] = esquerda;
   rssi_direita_array[ULTIMO] = direita;
@@ -148,6 +166,15 @@ void Controle::verificaEntrada(){
 void Controle::avancaArray(uint16_t *posicoes, uint8_t n) {
   for (uint8_t i = 0; i < n - 1; i++) {
     posicoes[i] = posicoes[i + 1];
+  }
+}
+
+/**
+ * Metodo que avança posição no array
+ */
+void Controle::avancaArrayObj(ObjData *objetos, uint8_t n) {
+  for (uint8_t i = 0; i < n - 1; i++) {
+    objetos[i] = objetos[i + 1];
   }
 }
 

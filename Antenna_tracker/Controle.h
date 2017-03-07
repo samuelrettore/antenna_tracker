@@ -2,6 +2,7 @@
 #define Controle_h
 
 #include "Arduino.h"
+#include "ObjData.h"
 
 class Controle {
   public:
@@ -12,6 +13,7 @@ class Controle {
 
   private:
     void avancaArray(uint16_t *posicoes, uint8_t n);
+    void avancaArrayObj(ObjData *objetos, uint8_t n); 
     void calibraRSSI(int esquerda, int direita);
     uint16_t media(uint16_t lista[], uint8_t n);
     int getAngulo();

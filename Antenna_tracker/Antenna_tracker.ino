@@ -5,6 +5,7 @@
  * Antenna Tracker baseada em Arduino e RSSI 
  */
 #include "Controle.h"
+#include "ObjData.h"
 
 Controle ctrl;
 

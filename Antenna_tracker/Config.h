@@ -54,7 +54,9 @@
 //#define RSSI_MIN 85
 //#define RSSI_MAX 244
 
+//Tamanho Array
 #define INICIO  10
+//Inicio Array
 #define ULTIMO  INICIO - 1
 
 uint16_t rssi_esquerda_array[INICIO];
