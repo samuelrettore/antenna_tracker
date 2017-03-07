@@ -1,7 +1,7 @@
 # antenna_tracker
 Sistema de posicionamento de antena automatico baseado em RSSI
 
-Sistema base utiliza tres antenas com calculo de RSSI de cara uma, a antena
+Sistema base utiliza tres antenas com calculo de RSSI de cada uma, a antena
 fica triangulada em mesma direção calculando sinal da esquerda, direita
 e acima para identificar e corrigir melhor apontamento.
 
