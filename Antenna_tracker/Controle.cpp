@@ -28,7 +28,7 @@ void Controle::IinicializaModulo(){
   Serial.println("Fim Setup");  
 }
 
-int Controle::getAngulo(){
+/*int Controle::getAngulo(){
   return angulo;
 }
 
@@ -38,32 +38,38 @@ int Controle::getEsquerda(){
 
 int Controle::getDireita(){
   return direita;
-}
+}*/
 
 /*
  * Calibração inicial.
  */
  void Controle::calibraInicio(){
   //Move Servo para posição Minima 
-  mudaAngulo(SERVO_MIN,20);
+  Serial.print("1 - Angulo para = ");
+  Serial.println(SERVO_MIN);
+  mudaAngulo(SERVO_MIN,40, true);
   lePortaCalibra();
-  delay(100);
+  delay(1000);
 
   //Move Servo para posição Maxima
-  mudaAngulo(SERVO_MAX,20);  
+  Serial.print("2 - Angulo para = ");
+  Serial.println(SERVO_MAX);
+  mudaAngulo(SERVO_MAX,40,true);  
   lePortaCalibra();
-  delay(100);
+  delay(1000);
 
+  Serial.print("3 - Angulo para = ");
+  Serial.println(angulo);
   //Move Servo para Centro.
-  mudaAngulo(angulo,20);
+  mudaAngulo(angulo,40, true);
   lePortaCalibra();
-  delay(100);
+  delay(1000);
  }
 
 /**
  * Metodo que efetua leitura de dados e calibração do RSSI.
  */
-void Controle::lePortaCalibra(){
+ObjData Controle::lePortaCalibra(){
   //esquerda = random(85, 244);
   //esquerda=0;
   //direita = random(85, 244); 
@@ -81,7 +87,7 @@ void Controle::lePortaCalibra(){
   avancaArrayObj(rssi_array_dados, INICIO);
 
   //Cria Objeto
-  ObjData obj; 
+  ObjData obj;
 
   //Preenche objetos
   obj.setEsquerda(esquerda);
@@ -97,7 +103,8 @@ void Controle::lePortaCalibra(){
   rssi_direita_array[ULTIMO] = direita;
   
   //Pode calibrar pelo array
-  calibraRSSI(esquerda,direita);
+  calibraRSSI(obj);
+  return obj;
 }
 
 /**
@@ -106,8 +113,8 @@ void Controle::lePortaCalibra(){
  * #featura: também deve calcular velocidade de deslocamento.
  */
 void Controle::verificaEntrada(){
-  
-  lePortaCalibra();
+  //Le dados da porta
+  ObjData obj_lido = lePortaCalibra();
 
   uint16_t mediaEsquerda = max(media(rssi_esquerda_array, INICIO), RSSI_MIN_e);
   uint16_t mediaDireita = max(media(rssi_direita_array, INICIO), RSSI_MIN_d);
@@ -116,7 +123,7 @@ void Controle::verificaEntrada(){
   //Experimental
   float ang = 0;
   
-  if(esquerda > direita && abs(rssi_esquerda_array[ULTIMO-1]-esquerda) > DEADBAND){
+  if(mediaEsquerda > mediaDireita && abs(rssi_esquerda_array[ULTIMO-1]-mediaEsquerda) > DEADBAND){
     //angulo = (angulo+1)*SERVO_DIRECTION;
 
     float x = float(mediaEsquerda - mediaDireita) / 10;
@@ -124,7 +131,7 @@ void Controle::verificaEntrada(){
     ang = x * SERVO_DIRECTION;
         
     
-  }else if(direita > esquerda && abs(rssi_direita_array[ULTIMO-1]-direita) > DEADBAND){
+  }else if(mediaDireita > mediaEsquerda && abs(rssi_direita_array[ULTIMO-1]-mediaDireita) > DEADBAND){
     //angulo = (angulo-1)*SERVO_DIRECTION;
 
     float x = float(mediaDireita - mediaEsquerda) / 10;
@@ -134,11 +141,11 @@ void Controle::verificaEntrada(){
   }  
 
   Serial.print("RSSI-esquerda = ");
-  Serial.print(getEsquerda());
+  Serial.print(obj_lido.getEsquerda());
   Serial.print(",direita = ");
-  Serial.print(getDireita());   
+  Serial.print(obj_lido.getDireita());   
   Serial.print(", angulo calc = ");
-  Serial.print(getAngulo());  
+  Serial.print(angulo);  
   Serial.print(", RSSI_MIN_e = ");
   Serial.print(RSSI_MIN_e);
   Serial.print(" / ");
@@ -146,19 +153,8 @@ void Controle::verificaEntrada(){
   Serial.print(", RSSI_MIN_D = ");
   Serial.print(RSSI_MIN_d);
   Serial.print(", / ");
-  Serial.println(RSSI_MAX_d);
-
-  
-  Serial.print("Valor esquerda=");
-  Serial.print(mediaEsquerda);
-  Serial.print(", valor direita=");
-  Serial.print(mediaDireita);
-  Serial.print(", ang = ");
-  Serial.print(ang);
-  Serial.print(", angulo = ");
-  Serial.println(getAngulo());
-  
-  mudaAngulo(ang,0);
+  Serial.println(RSSI_MAX_d);  
+  mudaAngulo(ang,0, false);
 }
 
 /**
@@ -183,16 +179,20 @@ void Controle::avancaArrayObj(ObjData *objetos, uint8_t n) {
 /**
  * Metodo que muda o angulo do motor, conforme processamento.
  */
-void Controle::mudaAngulo(int ang, int velocidade){
-  //Segurança Servo  
-  angulo += ang;
+void Controle::mudaAngulo(int ang, int velocidade, boolean calibrate){
+  //Segurança Servo
+  if(calibrate == false){  
+    angulo += ang;    
+  }else{
+      angulo = ang;
+  }
   angulo = constrain(angulo,SERVO_MIN,SERVO_MAX);  
   if(velocidade <= 0){
     velocidade = SERVO_SPEED;
   }
   //Velocidade Fixa
-  servoP.write(angulo, velocidade, true);
-  //delay(20);
+  servoP.write(angulo, velocidade, false);
+  delay(20);
 }
 
 
@@ -200,20 +200,20 @@ void Controle::mudaAngulo(int ang, int velocidade){
  * Metodo de calibração de RSSI
  * #Experimental
  */
- void Controle::calibraRSSI(int esquerda, int direita){
+ void Controle::calibraRSSI(ObjData obj){
     //Verifica Direita.
-    if(direita <= RSSI_MIN_d || RSSI_MIN_d == 0){
-        RSSI_MIN_d = direita;
+    if(obj.getDireita() <= RSSI_MIN_d || RSSI_MIN_d == 0){
+        RSSI_MIN_d = obj.getDireita();
     }
-    if(esquerda <= RSSI_MIN_e || RSSI_MIN_e == 0){
-        RSSI_MIN_e = esquerda;
+    if(obj.getEsquerda() <= RSSI_MIN_e || RSSI_MIN_e == 0){
+        RSSI_MIN_e = obj.getEsquerda();
     }
-    //Verifica Esquerda.
-    if(direita >= RSSI_MAX_d || RSSI_MAX_d ==0){
-      RSSI_MAX_d = direita;
+    //Verifica Direita.
+    if(obj.getDireita() >= RSSI_MAX_d || RSSI_MAX_d ==0){
+      RSSI_MAX_d = obj.getDireita();
     }
-    if(esquerda >= RSSI_MAX_e || RSSI_MAX_e ==0){
-      RSSI_MAX_e = esquerda;
+    if(obj.getEsquerda() >= RSSI_MAX_e || RSSI_MAX_e ==0){
+      RSSI_MAX_e =obj.getEsquerda();
     }
     //Verifica Superior.
     //#Future

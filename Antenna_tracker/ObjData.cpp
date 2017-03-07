@@ -2,35 +2,35 @@
 #include "ObjData.h"
 
 int ObjData::getEsquerda(){
-  return esquerda;
+  return _esquerda;
 }
 
 int ObjData::getDireita(){
-  return direita;
+  return _direita;
 }
 
 int ObjData::getPercentEsquerda(){
-  return percent_esquerda;  
+  return _percent_esquerda;  
 }
 
 int ObjData::getPercentDireita(){
-  return percent_direita;
+  return _percent_direita;
 }
 
 void ObjData::setEsquerda(int esquerda){
-  esquerda = esquerda;
+  _esquerda = esquerda;
 }
 
 void ObjData::setDireita(int direita){
-  direita = direita;
+  _direita = direita;
 }
 
 void ObjData::setPercentEsquerda(int percent){
-    percent_esquerda = percent;
+  _percent_esquerda = percent;
 }
 
 
 void ObjData::setPercentDireita(int percent){
-  percent_direita = percent;
+  _percent_direita = percent;
 }
 

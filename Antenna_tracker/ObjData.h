@@ -5,6 +5,9 @@
 
 class ObjData {
   public:
+    ObjData(){
+      _esquerda = 0;      
+    }
     int getEsquerda();
     int getDireita();
     int getPercentEsquerda();
@@ -15,10 +18,10 @@ class ObjData {
     void setPercentDireita(int percent);
     
   private:
-   int esquerda = 0;
-   int direita = 0;
-   int percent_esquerda = 0;
-   int percent_direita = 0;
+    int _esquerda;
+    int _direita;
+    int _percent_esquerda;
+    int _percent_direita;
 };
 
 #endif

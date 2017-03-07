@@ -8,18 +8,18 @@ class Controle {
   public:
    
    void IinicializaModulo();   
-   void mudaAngulo(int ang, int velocidade);
+   void mudaAngulo(int ang, int velocidade, boolean calibrate);
    void verificaEntrada();
 
   private:
     void avancaArray(uint16_t *posicoes, uint8_t n);
     void avancaArrayObj(ObjData *objetos, uint8_t n); 
-    void calibraRSSI(int esquerda, int direita);
+    void calibraRSSI(ObjData obj);
     uint16_t media(uint16_t lista[], uint8_t n);
     int getAngulo();
     int getEsquerda();
     int getDireita();
-    void lePortaCalibra();
+    ObjData lePortaCalibra();
     void calibraInicio();
     
     int angulo = 90;
