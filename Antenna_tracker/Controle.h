@@ -17,7 +17,9 @@ class Controle {
     int getAngulo();
     int getEsquerda();
     int getDireita();
-   
+    void lePortaCalibra();
+    void calibraInicio();
+    
     int angulo = 90;
     int esquerda = 0, direita = 0;  
     //Rssi Direita

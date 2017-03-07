@@ -14,12 +14,9 @@ void Controle::IinicializaModulo(){
   Serial.println("Iniciou Setup");
   servoP.attach(SERVO_PAN);
   //servoT.attach(SERVO_TILT);
-  mudaAngulo(SERVO_MIN,20);
-  delay(100);
-  mudaAngulo(SERVO_MAX,20);
-  delay(100);
-  mudaAngulo(angulo,20);
-  delay(100);
+  
+  calibraInicio();
+  
   //Zera arrays  
   for (int i = 0; i < INICIO; i++) {
     rssi_esquerda_array[i] = 0;
@@ -40,14 +37,31 @@ int Controle::getDireita(){
   return direita;
 }
 
-/**
- * Metodo que verifica entrada e controla rotação esquerda ou direita, 
- * conforme leitura de RSSI
- * #featura: também deve calcular velocidade de deslocamento.
+/*
+ * Calibração inicial.
  */
-void Controle::verificaEntrada(){
-  
-  //esquerda = random(85, 244);
+ void Controle::calibraInicio(){
+  //Move Servo para posição Minima 
+  mudaAngulo(SERVO_MIN,20);
+  lePortaCalibra();
+  delay(100);
+
+  //Move Servo para posição Maxima
+  mudaAngulo(SERVO_MAX,20);  
+  lePortaCalibra();
+  delay(100);
+
+  //Move Servo para Centro.
+  mudaAngulo(angulo,20);
+  lePortaCalibra();
+  delay(100);
+ }
+
+/**
+ * Metodo que efetua leitura de dados e calibração do RSSI.
+ */
+void Controle::lePortaCalibra(){
+   //esquerda = random(85, 244);
   //esquerda=0;
   //direita = random(85, 244); 
   //direita=0;  
@@ -66,6 +80,16 @@ void Controle::verificaEntrada(){
   
   //Pode calibrar pelo array
   calibraRSSI(esquerda,direita);
+}
+
+/**
+ * Metodo que verifica entrada e controla rotação esquerda ou direita, 
+ * conforme leitura de RSSI
+ * #featura: também deve calcular velocidade de deslocamento.
+ */
+void Controle::verificaEntrada(){
+  
+  lePortaCalibra();
 
   uint16_t mediaEsquerda = max(media(rssi_esquerda_array, INICIO), RSSI_MIN_e);
   uint16_t mediaDireita = max(media(rssi_direita_array, INICIO), RSSI_MIN_d);
