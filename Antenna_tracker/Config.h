@@ -36,7 +36,7 @@
  * Velocidade do servo
  * Valores de 1 a 255
  */
-#define SERVO_SPEED 50
+#define SERVO_SPEED 60
 
 //Direção Normal 0, invertido -1.
 #define SERVO_DIRECTION     1
