@@ -88,7 +88,8 @@ void Controle::lePortaCalibra(){
   obj.setDireita(direita);
   obj.setPercentEsquerda(map(esquerda,RSSI_MIN_e,RSSI_MAX_e,0,100));
   obj.setPercentDireita(map(direita,RSSI_MIN_d,RSSI_MAX_d,0,100));
-
+  
+  //Atribui Objeto ao array
   rssi_array_dados[ULTIMO] = obj;
   
   //Copia Para array
