@@ -15,8 +15,7 @@ void Controle::IinicializaModulo(){
   servoP.attach(SERVO_PAN);
   //servoT.attach(SERVO_TILT);
   
-  calibraInicio();
-  
+  calibraInicio();  
   //Zera arrays  
   for (int i = 0; i < INICIO; i++) {
     rssi_esquerda_array[i] = 0;
@@ -61,7 +60,7 @@ int Controle::getDireita(){
  * Metodo que efetua leitura de dados e calibração do RSSI.
  */
 void Controle::lePortaCalibra(){
-   //esquerda = random(85, 244);
+  //esquerda = random(85, 244);
   //esquerda=0;
   //direita = random(85, 244); 
   //direita=0;  
