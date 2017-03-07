@@ -122,23 +122,24 @@ void Controle::verificaEntrada(){
   
   //Experimental
   float ang = 0;
+  if(abs(mediaEsquerda - mediaDireita) > DEADBAND){
+    if(mediaEsquerda > mediaDireita){
+      //angulo = (angulo+1)*SERVO_DIRECTION;
   
-  if(mediaEsquerda > mediaDireita && abs(rssi_esquerda_array[ULTIMO-1]-mediaEsquerda) > DEADBAND){
-    //angulo = (angulo+1)*SERVO_DIRECTION;
-
-    float x = float(mediaEsquerda - mediaDireita) / 10;
-    x = (1+ exp(-SIGMOID_SLOPE * x + SIGMOID_OFFSET));
-    ang = x * SERVO_DIRECTION;
-        
-    
-  }else if(mediaDireita > mediaEsquerda && abs(rssi_direita_array[ULTIMO-1]-mediaDireita) > DEADBAND){
-    //angulo = (angulo-1)*SERVO_DIRECTION;
-
-    float x = float(mediaDireita - mediaEsquerda) / 10;
-    x = (1+ exp(-SIGMOID_SLOPE * x + SIGMOID_OFFSET));
-    ang = x * SERVO_DIRECTION * -1;      
-    
-  }  
+      float x = float(mediaEsquerda - mediaDireita) / 10;
+      x = (1+ exp(-SIGMOID_SLOPE * x + SIGMOID_OFFSET));
+      ang = x * SERVO_DIRECTION;
+          
+      
+    }else if(mediaDireita > mediaEsquerda){
+      //angulo = (angulo-1)*SERVO_DIRECTION;
+  
+      float x = float(mediaDireita - mediaEsquerda) / 10;
+      x = (1+ exp(-SIGMOID_SLOPE * x + SIGMOID_OFFSET));
+      ang = x * SERVO_DIRECTION * -1;      
+      
+    }  
+  }
 
   Serial.print("RSSI-esquerda = ");
   Serial.print(obj_lido.getEsquerda());
