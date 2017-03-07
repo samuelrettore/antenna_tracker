@@ -6,11 +6,6 @@
 VarSpeedServo servoP;
 //VarSpeedServo servoT;
 
-void Controle::Teste(int i){
-  Serial.print(" iiiiiiiiiii ");
-  Serial.print(i);
-}
-
 /**
  * Metodo inicialização do modulo
  */

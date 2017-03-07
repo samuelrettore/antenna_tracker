@@ -5,7 +5,7 @@
 
 class Controle {
   public:
-   void Teste(int i);
+   
    void IinicializaModulo();   
    void mudaAngulo(int ang, int velocidade);
    void verificaEntrada();
