@@ -8,7 +8,6 @@
  */
 
  
-
 /*
  * Configuracao RSSI
  * Portas de leitura das anteas RSSI
@@ -16,6 +15,7 @@
  */
 #define RSSI_direita 0
 #define RSSI_esquerda 1
+
 //#Future
 #define RSSI_vertical 2
 
@@ -46,4 +46,23 @@
  */
 #define SERVO_MAX 180
 #define SERVO_MIN 13
+
+/**
+ * Alterado para variaveis
+ * Calibracao automatica
+ */
+//#define RSSI_MIN 85
+//#define RSSI_MAX 244
+
+#define INICIO  10
+#define ULTIMO  INICIO - 1
+
+uint16_t rssi_esquerda_array[INICIO];
+uint16_t rssi_direita_array[INICIO];
+
+/**
+ * Variaveis usadas na biblioteca padrão.
+ */
+#define SIGMOID_SLOPE       1
+#define SIGMOID_OFFSET 4
 
