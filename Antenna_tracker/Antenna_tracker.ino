@@ -5,6 +5,8 @@
  * Antenna Tracker baseada em Arduino e RSSI 
  */
 #include <VarSpeedServo.h>
+#include "Controle.h"
+
 
 /*
  * Configuracao RSSI
@@ -78,6 +80,8 @@ uint16_t rssi_direita_array[INICIO];
 #define SIGMOID_SLOPE       1
 #define SIGMOID_OFFSET 4
 
+Controle ctrl;
+
 void setup() {
   Serial.begin(115200);
   Serial.println("Iniciou Setup");
@@ -97,6 +101,7 @@ void setup() {
     rssi_direita_array[i] = 0;
   }  
   Serial.println("Fim Setup");
+  ctrl.Teste(3);
 }
 
 /**
@@ -104,9 +109,9 @@ void setup() {
  */
 void loop() {
   verificaEntrada();
-  Serial.print("RSSI // esquerda = ");
+  Serial.print("RSSI-esquerda = ");
   Serial.print(esquerda);
-  Serial.print(", direita = ");
+  Serial.print(",direita = ");
   Serial.print(direita);   
   Serial.print(", angulo calc = ");
   Serial.print(angulo);  
@@ -160,8 +165,7 @@ void verificaEntrada(){
     float x = float(mediaEsquerda - mediaDireita) / 10;
     x = (1+ exp(-SIGMOID_SLOPE * x + SIGMOID_OFFSET));
     ang = x * SERVO_DIRECTION;
-    
-    
+        
     
   }else if(direita > esquerda && abs(rssi_direita_array[ULTIMO-1]-direita) > DEADBAND){
     //angulo = (angulo-1)*SERVO_DIRECTION;
