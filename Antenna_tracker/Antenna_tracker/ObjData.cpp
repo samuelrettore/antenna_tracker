@@ -10,7 +10,7 @@ int ObjData::getDireita(){
 }
 
 int ObjData::getPercentEsquerda(){
-  return _percent_esquerda;  
+  return _percent_esquerda;
 }
 
 int ObjData::getPercentDireita(){
@@ -33,4 +33,3 @@ void ObjData::setPercentEsquerda(int percent){
 void ObjData::setPercentDireita(int percent){
   _percent_direita = percent;
 }
-
