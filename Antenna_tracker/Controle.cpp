@@ -141,11 +141,15 @@ void Controle::verificaEntrada(){
     }  
   }
 
-  Serial.print("RSSI-esquerda = ");
+  Serial.print("RSSI esquerda=");
   Serial.print(obj_lido.getEsquerda());
-  Serial.print(",direita = ");
+  Serial.print("/");
+  Serial.print(obj_lido.getPercentEsquerda());
+  Serial.print("% ,direita=");
   Serial.print(obj_lido.getDireita());   
-  Serial.print(", angulo calc = ");
+  Serial.print("/");
+  Serial.print(obj_lido.getPercentDireita());
+  Serial.print("%, angulo calc = ");
   Serial.print(angulo);  
   Serial.print(", RSSI_MIN_e = ");
   Serial.print(RSSI_MIN_e);
