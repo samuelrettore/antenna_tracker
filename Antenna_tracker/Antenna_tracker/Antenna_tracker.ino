@@ -1,3 +1,5 @@
+#include <Arduino.h>
+
 
 /**
  * Projeto desenvolvido por Samuel Rettore e Hugo Almeida

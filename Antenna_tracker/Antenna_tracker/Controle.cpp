@@ -113,6 +113,7 @@ ObjData Controle::lePortaCalibra(){
  * #featura: também deve calcular velocidade de deslocamento.
  */
 void Controle::verificaEntrada(){
+  
   //Le dados da porta
   ObjData obj_lido = lePortaCalibra();
 
@@ -122,6 +123,7 @@ void Controle::verificaEntrada(){
   
   //Experimental
   float ang = 0;
+
   if(abs(mediaEsquerda - mediaDireita) > DEADBAND){
     if(mediaEsquerda > mediaDireita){
       //angulo = (angulo+1)*SERVO_DIRECTION;
