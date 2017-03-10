@@ -90,8 +90,8 @@ ObjData Controle::lePortaCalibra(){
   obj.setEsquerda(esquerda);
   obj.setDireita(direita);
   //Calcula Percentuais.
-  obj.setPercentEsquerda(map(esquerda,RSSI_MIN_e,RSSI_MAX_e,0,100));
-  obj.setPercentDireita(map(direita,RSSI_MIN_d,RSSI_MAX_d,0,100));
+  obj.setPercentEsquerda(map(esquerda, RSSI_MIN_e, RSSI_MAX_e, 0, 100));
+  obj.setPercentDireita(map(direita, RSSI_MIN_d, RSSI_MAX_d, 0, 100));
 
   //Atribui Objeto ao array
   rssi_array_dados[ULTIMO] = obj;
@@ -142,11 +142,15 @@ void Controle::verificaEntrada(){
   Serial.print(obj_lido.getEsquerda());
   Serial.print("/");
   Serial.print(obj_lido.getPercentEsquerda());
-  Serial.print("% ,direita=");
+  Serial.print("%-->");
+  Serial.print(mediaEsquerda);
+  Serial.print(",direita=");
   Serial.print(obj_lido.getDireita());
   Serial.print("/");
   Serial.print(obj_lido.getPercentDireita());
-  Serial.print("%, angulo calc = ");
+  Serial.print("%-->");
+  Serial.print(mediaDireita);
+  Serial.print(", angulo calc = ");
   Serial.print(angulo);
   Serial.print(", RSSI_MIN_e = ");
   Serial.print(RSSI_MIN_e);
@@ -220,7 +224,7 @@ void Controle::mudaAngulo(int ang, int velocidade, boolean calibrate){
  */
 ObjMedia Controle::media(ObjData lista[], uint8_t n) {
   ObjMedia obj_med;
-  for (uint8_t i = 0; i < n; i++) {    
+  for (uint8_t i = 0; i < n; i++) {
     obj_med.setDireitaMedia(obj_med.getDireitaMedia()+lista[i].getDireita());
     obj_med.setEsquerdaMedia(obj_med.getEsquerdaMedia()+lista[i].getEsquerda());
   }
