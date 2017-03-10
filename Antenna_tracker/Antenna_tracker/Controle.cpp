@@ -80,11 +80,6 @@ ObjData Controle::lePortaCalibra(){
   esquerda = analogRead(RSSI_esquerda);
   direita = analogRead(RSSI_direita);
 
-  //Desloca Array
-  //Deprecated
-  //avancaArray(rssi_esquerda_array, INICIO);
-  //avancaArray(rssi_direita_array, INICIO);
-
   //Desloca Array de Objetos
   avancaArrayObj(rssi_array_dados, INICIO);
 
@@ -100,11 +95,6 @@ ObjData Controle::lePortaCalibra(){
 
   //Atribui Objeto ao array
   rssi_array_dados[ULTIMO] = obj;
-
-  //Copia Para array
-  //Deprecated
-  //rssi_esquerda_array[ULTIMO] = esquerda;
-  //rssi_direita_array[ULTIMO] = direita;
 
   //Pode calibrar pelo array
   calibraRSSI(obj);
@@ -230,8 +220,7 @@ void Controle::mudaAngulo(int ang, int velocidade, boolean calibrate){
  */
 ObjMedia Controle::media(ObjData lista[], uint8_t n) {
   ObjMedia obj_med;
-  for (uint8_t i = 0; i < n; i++) {
-    Serial.println(lista[i].getDireita());
+  for (uint8_t i = 0; i < n; i++) {    
     obj_med.setDireitaMedia(obj_med.getDireitaMedia()+lista[i].getDireita());
     obj_med.setEsquerdaMedia(obj_med.getEsquerdaMedia()+lista[i].getEsquerda());
   }
