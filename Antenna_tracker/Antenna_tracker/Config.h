@@ -1,13 +1,13 @@
 /**
  * Projeto desenvolvido por Samuel Rettore e Hugo Almeida
  * Baseado no projeto https://youtu.be/aACTKziuDVE
- * Antenna Tracker baseada em Arduino e RSSI 
- * 
+ * Antenna Tracker baseada em Arduino e RSSI
+ *
  * ==== Configuração ===========
- * 
+ *
  */
 
- 
+
 /*
  * Configuracao RSSI
  * Portas de leitura das anteas RSSI
@@ -54,17 +54,13 @@
 //#define RSSI_MIN 85
 //#define RSSI_MAX 244
 
-//Tamanho Array
+//Tamanho Array maximo
 #define INICIO  10
-//Inicio Array
+//Inicio Array De dados
 #define ULTIMO  INICIO - 1
-
-uint16_t rssi_esquerda_array[INICIO];
-uint16_t rssi_direita_array[INICIO];
 
 /**
  * Variaveis usadas na biblioteca padrão.
  */
 #define SIGMOID_SLOPE       1
 #define SIGMOID_OFFSET 4
-

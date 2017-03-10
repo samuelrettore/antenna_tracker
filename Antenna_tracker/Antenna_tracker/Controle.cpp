@@ -2,6 +2,7 @@
 #include "Controle.h"
 #include "Config.h"
 #include "ObjData.h"
+#include "ObjMedia.h"
 #include <VarSpeedServo.h>
 
 VarSpeedServo servoP;
@@ -21,10 +22,10 @@ void Controle::IinicializaModulo(){
   calibraInicio();
 
   //Zera arrays
-  for (int i = 0; i < INICIO; i++) {
+  /*for (int i = 0; i < INICIO; i++) {
     rssi_esquerda_array[i] = 0;
     rssi_direita_array[i] = 0;
-  }
+  }*/
   Serial.println("Fim Setup");
 }
 
@@ -59,7 +60,7 @@ int Controle::getDireita(){
   delay(1000);
 
   Serial.print("3 - Angulo para = ");
-  Serial.println(angulo);
+  Serial.println("90");
   //Move Servo para Centro.
   mudaAngulo(90,40, true);
   lePortaCalibra();
@@ -70,18 +71,19 @@ int Controle::getDireita(){
  * Metodo que efetua leitura de dados e calibração do RSSI.
  */
 ObjData Controle::lePortaCalibra(){
-  //esquerda = random(85, 244);
+  esquerda = random(85, 244);
   //esquerda=0;
-  //direita = random(85, 244);
+  direita = random(85, 244);
   //direita=0;
 
   //Le dados da porta
-  esquerda = analogRead(RSSI_esquerda);
-  direita = analogRead(RSSI_direita);
+  //esquerda = analogRead(RSSI_esquerda);
+  //direita = analogRead(RSSI_direita);
 
   //Desloca Array
-  avancaArray(rssi_esquerda_array, INICIO);
-  avancaArray(rssi_direita_array, INICIO);
+  //Deprecated
+  //avancaArray(rssi_esquerda_array, INICIO);
+  //avancaArray(rssi_direita_array, INICIO);
 
   //Desloca Array de Objetos
   avancaArrayObj(rssi_array_dados, INICIO);
@@ -92,6 +94,7 @@ ObjData Controle::lePortaCalibra(){
   //Preenche objetos
   obj.setEsquerda(esquerda);
   obj.setDireita(direita);
+  //Calcula Percentuais.
   obj.setPercentEsquerda(map(esquerda,RSSI_MIN_e,RSSI_MAX_e,0,100));
   obj.setPercentDireita(map(direita,RSSI_MIN_d,RSSI_MAX_d,0,100));
 
@@ -99,8 +102,9 @@ ObjData Controle::lePortaCalibra(){
   rssi_array_dados[ULTIMO] = obj;
 
   //Copia Para array
-  rssi_esquerda_array[ULTIMO] = esquerda;
-  rssi_direita_array[ULTIMO] = direita;
+  //Deprecated
+  //rssi_esquerda_array[ULTIMO] = esquerda;
+  //rssi_direita_array[ULTIMO] = direita;
 
   //Pode calibrar pelo array
   calibraRSSI(obj);
@@ -117,15 +121,16 @@ void Controle::verificaEntrada(){
   //Le dados da porta
   ObjData obj_lido = lePortaCalibra();
 
-  uint16_t mediaEsquerda = max(media(rssi_esquerda_array, INICIO), RSSI_MIN_e);
-  uint16_t mediaDireita = max(media(rssi_direita_array, INICIO), RSSI_MIN_d);
-
+  ObjMedia objmed = media(rssi_array_dados, INICIO);
+  uint16_t mediaEsquerda = max(objmed.getEsquerdaMedia(), RSSI_MIN_e);
+  uint16_t mediaDireita = max(objmed.getDireitaMedia(), RSSI_MIN_d);
 
   //Experimental
   float ang = 0;
-
+  //Verifica se diferença da media maior que DEADBAND
   if(abs(mediaEsquerda - mediaDireita) > DEADBAND){
     if(mediaEsquerda > mediaDireita){
+      //OldCode
       //angulo = (angulo+1)*SERVO_DIRECTION;
 
       float x = float(mediaEsquerda - mediaDireita) / 10;
@@ -134,12 +139,12 @@ void Controle::verificaEntrada(){
 
 
     }else if(mediaDireita > mediaEsquerda){
+      //OldCode
       //angulo = (angulo-1)*SERVO_DIRECTION;
 
       float x = float(mediaDireita - mediaEsquerda) / 10;
       x = (1+ exp(-SIGMOID_SLOPE * x + SIGMOID_OFFSET));
       ang = x * SERVO_DIRECTION * -1;
-
     }
   }
 
@@ -157,20 +162,11 @@ void Controle::verificaEntrada(){
   Serial.print(RSSI_MIN_e);
   Serial.print(" / ");
   Serial.print(RSSI_MAX_e);
-  Serial.print(", RSSI_MIN_D = ");
+  Serial.print(", RSSI_MIN_d = ");
   Serial.print(RSSI_MIN_d);
   Serial.print(", / ");
   Serial.println(RSSI_MAX_d);
   mudaAngulo(ang,0, false);
-}
-
-/**
- * Metodo que avança posição no array
- */
-void Controle::avancaArray(uint16_t *posicoes, uint8_t n) {
-  for (uint8_t i = 0; i < n - 1; i++) {
-    posicoes[i] = posicoes[i + 1];
-  }
 }
 
 /**
@@ -227,13 +223,18 @@ void Controle::mudaAngulo(int ang, int velocidade, boolean calibrate){
  }
 
 
+
 /**
  * Metodo de calculo de media das medições rssi (ultimas 10).
  */
-uint16_t Controle::media(uint16_t lista[], uint8_t n) {
-  uint32_t soma = 0;
+ObjMedia Controle::media(ObjData lista[], uint8_t n) {
+  ObjMedia obj_med;
   for (uint8_t i = 0; i < n; i++) {
-    soma += lista[i];
+    Serial.println(lista[i].getDireita());
+    obj_med.setDireitaMedia(obj_med.getDireitaMedia()+lista[i].getDireita());
+    obj_med.setEsquerdaMedia(obj_med.getEsquerdaMedia()+lista[i].getEsquerda());
   }
-  return uint16_t(soma / n);
+  obj_med.setDireitaMedia(obj_med.getDireitaMedia()/n);
+  obj_med.setEsquerdaMedia(obj_med.getEsquerdaMedia()/n);
+  return obj_med;
 }
