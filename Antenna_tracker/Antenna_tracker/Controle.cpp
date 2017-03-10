@@ -71,14 +71,14 @@ int Controle::getDireita(){
  * Metodo que efetua leitura de dados e calibração do RSSI.
  */
 ObjData Controle::lePortaCalibra(){
-  esquerda = random(85, 244);
+  //esquerda = random(85, 244);
   //esquerda=0;
-  direita = random(85, 244);
+  //direita = random(85, 244);
   //direita=0;
 
   //Le dados da porta
-  //esquerda = analogRead(RSSI_esquerda);
-  //direita = analogRead(RSSI_direita);
+  esquerda = analogRead(RSSI_esquerda);
+  direita = analogRead(RSSI_direita);
 
   //Desloca Array
   //Deprecated
@@ -226,6 +226,7 @@ void Controle::mudaAngulo(int ang, int velocidade, boolean calibrate){
 
 /**
  * Metodo de calculo de media das medições rssi (ultimas 10).
+ * OO
  */
 ObjMedia Controle::media(ObjData lista[], uint8_t n) {
   ObjMedia obj_med;
