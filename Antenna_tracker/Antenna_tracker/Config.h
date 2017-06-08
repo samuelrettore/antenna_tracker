@@ -7,7 +7,6 @@
  *
  */
 
-
 /*
  * Configuracao RSSI
  * Portas de leitura das anteas RSSI
@@ -15,7 +14,6 @@
  */
 #define RSSI_direita 0
 #define RSSI_esquerda 1
-
 //#Future
 #define RSSI_vertical 2
 
