@@ -10,7 +10,7 @@
 /*
  * Configuracao RSSI
  * Portas de leitura das anteas RSSI
- * Niveis de RSSI para Calibração
+ * Niveis de cd ..RSSI para Calibração
  */
 #define RSSI_direita 0
 #define RSSI_esquerda 1
